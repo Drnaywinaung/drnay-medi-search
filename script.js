@@ -10,6 +10,10 @@ const resultsContainer = document.getElementById('resultsContainer');
 // Listen for input in the search box
 searchInput.addEventListener('input', handleSearch);
 
+// --- NEW HELPER FUNCTION TO SHOW LOADER ---
+function showLoader() {
+  resultsContainer.innerHTML = '<div class="loader"></div>';
+}
 
 async function handleSearch(event) {
     const query = event.target.value.toLowerCase().trim();
@@ -19,6 +23,9 @@ async function handleSearch(event) {
         resultsContainer.innerHTML = '<p>Enter a drug name to begin your search.</p>';
         return;
     }
+
+    // --- ADD THIS LINE TO SHOW THE LOADER ---
+    showLoader();
 
     // Determine which JSON file to load based on the first letter
     const firstLetter = query.charAt(0);
@@ -36,27 +43,27 @@ async function handleSearch(event) {
 
         const data = await response.json();
 
-        // --- Search logic to check name, composition1, and composition2 ---
+        // Search logic to check name, composition1, and composition2
         const matches = data.filter(drug => {
             const nameMatch = drug.name && drug.name.toLowerCase().includes(query);
             const composition1Match = drug.short_composition1 && drug.short_composition1.toLowerCase().includes(query);
             const composition2Match = drug.short_composition2 && drug.short_composition2.toLowerCase().includes(query);
 
-            return nameMatch || composition1Match || composition2Match; // Return true if ANY of the fields match
+            return nameMatch || composition1Match || composition2Match;
         });
-        // --- End of search logic ---
 
-        // Display the results
+        // Display the results (this will replace the loader)
         displayResults(matches);
 
     } catch (error) {
         console.error("Failed to fetch or process data:", error);
+        // Display an error message (this will also replace the loader)
         resultsContainer.innerHTML = '<p>An error occurred. Check the console for details.</p>';
     }
 }
 
 function displayResults(matches) {
-    // Clear previous results
+    // Clear previous results (or the loader)
     resultsContainer.innerHTML = '';
 
     if (matches.length === 0) {
@@ -69,7 +76,7 @@ function displayResults(matches) {
         const resultElement = document.createElement('div');
         resultElement.classList.add('result-item');
 
-        // Combine composition fields, handling if the second one is missing. Trim whitespace.
+        // Combine composition fields
         let composition = drug.short_composition1 ? drug.short_composition1.trim() : 'N/A';
         if (drug.short_composition2 && drug.short_composition2.trim() !== "") {
             composition += ` + ${drug.short_composition2.trim()}`;
