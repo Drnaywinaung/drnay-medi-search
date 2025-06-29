@@ -71,7 +71,6 @@ function displayResults(matches) {
         const resultElement = document.createElement('div');
         resultElement.classList.add('result-item');
 
-        // --- THIS IS THE UPDATED PART ---
         // Combine composition fields, handling if the second one is missing. Trim whitespace.
         let composition = drug.short_composition1 ? drug.short_composition1.trim() : 'N/A';
         if (drug.short_composition2 && drug.short_composition2.trim() !== "") {
@@ -85,7 +84,10 @@ function displayResults(matches) {
             <p><strong>Composition:</strong> ${composition}</p>
             ${drug.manufacturer_name ? `<p><strong>Manufacturer:</strong> ${drug.manufacturer_name}</p>` : ''}
             ${drug.pack_size_label ? `<p><strong>Pack Size:</strong> ${drug.pack_size_label}</p>` : ''}
-        `;
+            
+            ${drug.medicine_desc ? `<p><strong>Description:</strong> ${drug.medicine_desc}</p>` : ''}
+            ${drug.side_effects ? `<p><strong>Side Effects:</strong> ${drug.side_effects}</p>` : ''}
+            `;
         resultsContainer.appendChild(resultElement);
     });
 }
