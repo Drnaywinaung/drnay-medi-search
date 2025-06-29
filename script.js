@@ -22,8 +22,6 @@ async function handleSearch(event) {
 
     // Determine which JSON file to load based on the first letter
     const firstLetter = query.charAt(0);
-
-    // Construct the correct URL for the JSON file using jsDelivr
     const url = `https://cdn.jsdelivr.net/gh/${GITHUB_USERNAME}/${GITHUB_REPO}@main/${firstLetter}.json`;
 
     try {
@@ -32,21 +30,21 @@ async function handleSearch(event) {
         
         // Handle cases where the file doesn't exist (e.g., for 'x.json')
         if (!response.ok) {
-            if (response.status === 404) {
-                 displayNoResults();
-            } else {
-                 resultsContainer.innerHTML = '<p>Error loading data. Please try again later.</p>';
-            }
+            displayNoResults();
             return;
         }
 
         const data = await response.json();
 
-        // Filter the data from the loaded file to find matches based on the 'name' field
+        // --- Search logic to check name, composition1, and composition2 ---
         const matches = data.filter(drug => {
-            // Ensure drug.name exists and is a string before calling toLowerCase()
-            return drug.name && drug.name.toLowerCase().includes(query);
+            const nameMatch = drug.name && drug.name.toLowerCase().includes(query);
+            const composition1Match = drug.short_composition1 && drug.short_composition1.toLowerCase().includes(query);
+            const composition2Match = drug.short_composition2 && drug.short_composition2.toLowerCase().includes(query);
+
+            return nameMatch || composition1Match || composition2Match; // Return true if ANY of the fields match
         });
+        // --- End of search logic ---
 
         // Display the results
         displayResults(matches);
@@ -77,8 +75,7 @@ function displayResults(matches) {
             composition += ` + ${drug.short_composition2.trim()}`;
         }
 
-        // Build the HTML for the result item using the new data structure
-        // We use checks like (drug.manufacturer_name ? ... : '') to only show a line if the data exists
+        // Build the HTML for the result item
         resultElement.innerHTML = `
             <h3>${drug.name || 'Name not available'}</h3>
             <p><strong>Composition:</strong> ${composition}</p>
@@ -86,7 +83,7 @@ function displayResults(matches) {
             ${drug.pack_size_label ? `<p><strong>Pack Size:</strong> ${drug.pack_size_label}</p>` : ''}
             ${drug.medicine_desc ? `<p><strong>Description:</strong> ${drug.medicine_desc}</p>` : ''}
             ${drug.side_effects ? `<p><strong>Side Effects:</strong> ${drug.side_effects}</p>` : ''}
-            `;
+        `;
         resultsContainer.appendChild(resultElement);
     });
 }
