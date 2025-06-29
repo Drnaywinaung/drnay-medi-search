@@ -84,7 +84,6 @@ function displayResults(matches) {
             <p><strong>Composition:</strong> ${composition}</p>
             ${drug.manufacturer_name ? `<p><strong>Manufacturer:</strong> ${drug.manufacturer_name}</p>` : ''}
             ${drug.pack_size_label ? `<p><strong>Pack Size:</strong> ${drug.pack_size_label}</p>` : ''}
-            
             ${drug.medicine_desc ? `<p><strong>Description:</strong> ${drug.medicine_desc}</p>` : ''}
             ${drug.side_effects ? `<p><strong>Side Effects:</strong> ${drug.side_effects}</p>` : ''}
             `;
